@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>JKT Rod Billing</title>
+<link rel="stylesheet" href="/assets/app.css"></head><body>
+<div id="ld" class="card">Loading…</div>
+<div id="app" class="wrap" hidden>
+  <nav>
+    <button id="b_dash" data-act="nav" data-t="dash">📊 Dashboard</button>
+    <button id="b_bill" data-act="nav" data-t="bill">🧾 Billing</button>
+    <button id="b_stock" data-act="nav" data-t="stock">📦 Stock</button>
+    <button id="b_set" data-act="nav" data-t="set">⚙️ Settings &amp; Backup</button>
+    <span id="fs" class="mu" style="margin-left:auto;align-self:center;font-size:13px"></span><button class="tgl" data-act="tg"></button><button data-act="logout">Logout</button>
+  </nav>
+
+  <div id="t_dash" hidden>
+    <div class="card"><h3>Total available stock</h3><div id="dtot"></div></div>
+    <div id="dgrid" class="grid"></div>
+    <div class="card"><h3>Sales &amp; payments</h3><div id="dsal"></div></div>
+  </div>
+
+  <div id="t_bill">
+    <div class="card">
+      <h3 id="bt">New Bill</h3>
+      <div class="row"><input id="cn" placeholder="Customer name"><input id="cp" placeholder="Phone"><select id="py" style="flex:1;min-width:150px"><option value="Cash">Cash</option><option value="Online">Online</option><option value="Pending">Not paid (Pending)</option></select></div>
+      <div class="mu"><small>Live stock (updates as you bill):</small></div><div id="ls" class="chips"></div>
+      <table><thead><tr><th style="width:32%">Rod size (type or pick)</th><th>Weight (kg)</th><th>Rate / kg</th><th>Amount</th><th>Stock left</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+      <div class="tot"><span>Total kg: <b id="tk">0.00</b></span><span>Total: ₹<b id="ta">0.00</b></span></div>
+      <button data-act="addrow">+ Add row</button>
+      <button class="p" id="sb" data-act="save">Save Bill</button>
+      <button class="p" data-act="saveprint">Save &amp; Print</button>
+      <button data-act="newbill">Clear / New</button>
+      <p><small>Enter = next box · type size (e.g. 7 or TMT) · ↑ ↓ pick from list · Enter on last rate = new row · Ctrl+Enter = save</small></p>
+    </div>
+    <div class="card">
+      <h3>Previous bills</h3>
+      <div class="row"><input id="sq" placeholder="Search customer or bill no" data-inp="rl"></div>
+      <table><thead><tr><th>No</th><th>Date</th><th>Customer</th><th>Kg</th><th>Total</th><th>Payment</th><th></th></tr></thead><tbody id="bl"></tbody></table>
+      <small>Click a row, use ↑ ↓ to move, Enter to open for edit.</small>
+    </div>
+  </div>
+
+  <div id="t_stock" hidden>
+    <div class="card">
+      <h3>Add rod size</h3>
+      <div class="row"><input id="zn" list="zp" placeholder="Pick or type e.g. TMT ROD 7 MM" style="text-transform:uppercase"><datalist id="zp"></datalist><input id="zcode" placeholder="Rod code (blank = auto)"><input id="zw" type="number" step="any" placeholder="Weight per rod (kg)"><input id="zk" type="number" step="any" placeholder="Opening stock (kg)"><input id="zr" type="number" step="any" placeholder="Rate / kg"><button class="p" data-act="az">Add size</button><button data-act="presets">Add all TMT sizes</button></div>
+      <small>Codes (ROD-001, ROD-002 …) are made automatically if left blank and can be changed later in the table. Names are saved in CAPITAL letters. “Weight per rod” fills the kg box in billing when the size is picked.</small>
+    </div>
+    <div class="card">
+      <h3>Read weights from image</h3>
+      <div class="row"><select id="oz"></select><input type="file" id="of" accept="image/*" data-chg="oimg"><button class="p" id="ob" data-act="ocr">Read image</button></div>
+      <img id="oi" alt="" style="max-width:260px;max-height:200px;display:none;border-radius:8px;margin-bottom:8px">
+      <div id="os" class="mu"></div>
+      <div id="ores" hidden>
+        <textarea id="otx" rows="6" data-inp="osum" style="width:100%;font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--cd);color:var(--tx)"></textarea>
+        <div class="tot"><span>Weights found: <b id="ocnt">0</b></span><span>Total: <b id="otot">0.00</b> kg</span></div>
+        <button class="p" data-act="oadd">Add total to selected size stock</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Stock inventory</h3>
+      <div class="row"><input id="zs" placeholder="Search by size or rod code" data-inp="rs"></div>
+      <table><thead><tr><th>Code</th><th>Size</th><th>Wt / rod</th><th>Rate</th><th>In stock</th><th>Add / Set kg</th><th></th></tr></thead><tbody id="sl"></tbody></table>
+      <small>Click History to see every stock-in and bill deduction for that size. Type kg in the box, then “+ Add” to add stock or “Set” to replace it. Bills deduct stock automatically.</small>
+    </div>
+  </div>
+
+  <div id="t_set" hidden>
+    <div class="card">
+      <h3>Shop details on printed bill</h3>
+      <div class="row"><input id="sn" placeholder="Shop name on print" maxlength="80"></div>
+      <div class="row"><input id="sa" placeholder="Address / phone line on print" maxlength="200"></div>
+      <button class="p" data-act="ss">Save settings</button>
+    </div>
+    <div class="card">
+      <h3>Change login</h3>
+      <div class="row"><input id="cpw" type="password" placeholder="Current password" autocomplete="current-password"></div>
+      <div class="row"><input id="ni" placeholder="New ID (blank = keep)" autocomplete="off"><input id="np" type="password" placeholder="New password (min 10 characters)" autocomplete="new-password"><input id="np2" type="password" placeholder="Repeat new password" autocomplete="new-password"></div>
+      <p class="mu">Changing your login signs out every other phone and computer.</p>
+      <button class="p" data-act="chpw">Change login</button>
+    </div>
+    <div class="card">
+      <h3>Backup</h3>
+      <p class="mu">Your data is stored on the server. Still download a backup file now and then and keep it somewhere safe. Backups from the old software can also be restored here.</p>
+      <button class="p" data-act="bk">⬇ Download backup</button>
+      <button data-act="restore">⬆ Restore backup</button>
+      <input type="file" id="rf1" accept=".json" hidden data-chg="rf">
+    </div>
+  </div>
+</div>
+
+<div id="sgb" hidden></div>
+<div id="pa"></div>
+
+<div id="toast" class="card" hidden></div>
+<script src="/assets/app.js"></script>
+</body></html>
